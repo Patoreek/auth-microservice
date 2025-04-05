@@ -6,7 +6,7 @@ export interface User {
   password: string;
 }
 
-const createUser = async (email: string, hashedPassword: string): Promise<any> => {
+const createUser = async (email: string, hashedPassword: string): Promise<User> => {
   const result = await pool.query(
     'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
     [email, hashedPassword]
@@ -14,7 +14,7 @@ const createUser = async (email: string, hashedPassword: string): Promise<any> =
   return result.rows[0];
 };
 
-const findUserByEmail = async (email: string): Promise<any> => {
+const findUserByEmail = async (email: string): Promise<User> => {
   const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
   return result.rows[0];
 };

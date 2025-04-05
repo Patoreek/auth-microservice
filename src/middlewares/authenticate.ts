@@ -20,7 +20,7 @@ export default function authenticate(
 
   if (!token) {
     res.status(401).json({ message: 'No token provided' });
-    return; 
+    return;
   }
 
   try {
@@ -29,13 +29,13 @@ export default function authenticate(
     // Optional: check if decoded has `id` just to be safe
     if (!decoded.id) {
       res.status(403).json({ message: 'Invalid token payload' });
-      return; 
+      return;
     }
 
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(403).json({ message: 'Invalid token' });
-    return; 
+    res.status(403).json({ message: 'Invalid token', error: err });
+    return;
   }
 }

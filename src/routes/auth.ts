@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import passport, { AuthenticateOptions, PassportStatic } from 'passport';
+import passport from 'passport';
 import { createUser, findUserByEmail } from '../models/userModel';
 import { User } from '../models/userModel';
 
@@ -21,21 +21,21 @@ const createJwtToken = (user: User, res: Response): void => {
 
   res.status(200).json({ user: user, message: 'Logged in' });
   return;
-}
+};
 
-router.post('/signup', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.post('/signup', async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     res.status(400).json({ message: 'Email and password are required' });
-    return; 
+    return;
   }
 
   try {
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
       res.status(400).json({ message: 'Email already exists' });
-      return; 
+      return;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -45,12 +45,12 @@ router.post('/signup', async (req: Request, res: Response, next: NextFunction): 
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ message: 'An error occurred during signup' });
-    return; 
+    return;
   }
 });
 
 router.post('/login', (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate('local', { session: false }, (err: any, user: any, info: any) => {
+  passport.authenticate('local', { session: false }, (err: Error, user: User) => {
     if (err || !user) {
       console.log(err);
       return res.status(400).json({ message: err?.message || 'Authentication failed' });
