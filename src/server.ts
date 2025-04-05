@@ -1,16 +1,32 @@
 import express from "express";
+import expressSession from "express-session";
 import cors from "cors";
 import passport from "passport";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth";
 import initializePassport from "./passport/localStrategy";
+import configureGoogleStrategy from "./passport/googleStrategy";
 import authenticate, { AuthenticatedRequest } from "./middlewares/authenticate";
 
 dotenv.config();
 
 const app = express();
+app.use(
+  expressSession({
+    secret: process.env.SESSION_SECRET!, // Set your session secret (preferably from .env)
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Set to true in production for secure cookies
+      maxAge: 1000 * 60 * 60 * 24, // Example: 1 day
+    },
+  }),
+);
+
 initializePassport(passport);
+configureGoogleStrategy(passport);
 
 app.use(
   cors({
