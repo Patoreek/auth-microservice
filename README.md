@@ -84,12 +84,13 @@ Your auth microservice uses a PostgreSQL users table structured as follows:
 | Field           | Type      | Description                                                              |
 | --------------- | --------- | ------------------------------------------------------------------------ |
 | `id`            | `serial`  | Auto-incrementing primary key                                            |
-| `name`          | `varchar` | Required full name of the user                                           |
+| `firstName`     | `varchar` | Required first name of the user                                          |
+| `lastName`      | `varchar` | Required last name of the user                                           |
+| `displayName`   | `varchar` | Optional display name (e.g., username or full name override)             |
 | `email`         | `varchar` | Required unique email for login and identity                             |
 | `password`      | `varchar` | Hashed password (not required for OAuth users)                           |
 | `googleId`      | `varchar` | Google account ID if user logs in with Google OAuth                      |
-| `facebookId`    | `varchar` | Facebook account ID if user logs in with Facebook OAuth                  |
-| `provider`      | `varchar` | Authentication method (e.g., `local`, `google`, `facebook`)              |
+| `provider`      | `varchar` | Authentication method (e.g., `local`, `google`)                          |
 | `twofa_secret`  | `varchar` | Base32 secret used for 2FA token generation (e.g., Google Authenticator) |
 | `twofa_enabled` | `boolean` | Whether 2FA is enabled for the user                                      |
 
@@ -114,14 +115,16 @@ Your auth microservice uses a PostgreSQL users table structured as follows:
 ```
 ts
 fetch(“http://localhost:4000/api/auth/signup”, {
-    method: “POST”,
-    credentials: “include”,
-    headers: {
-    “Content-Type”: “application/json”,
+      method: “POST”,
+      credentials: “include”,
+      headers: {
+      “Content-Type”: “application/json”,
     },
     body: JSON.stringify({
-    email: “test@example.com”,
-    password: “password123”,
+      firstName: "Test",
+      lastName: "User",
+      email: "test@example.com",
+      password: "password123",
     }),
 });
 ```
@@ -131,14 +134,14 @@ fetch(“http://localhost:4000/api/auth/signup”, {
 ```
 ts
     fetch(“http://localhost:4000/api/auth/login”, {
-    method: “POST”,
-    credentials: “include”,
-    headers: {
-    “Content-Type”: “application/json”,
+      method: “POST”,
+      credentials: “include”,
+      headers: {
+      “Content-Type”: “application/json”,
     },
     body: JSON.stringify({
-    email: “test@example.com”,
-    password: “password123”,
+      email: “test@example.com”,
+      password: “password123”,
     }),
 });
 ```

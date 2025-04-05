@@ -1,7 +1,7 @@
 {
   "name": "auth-microservice",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "description": "Authentication microservice using Passport.js, JWT, and PostgreSQL",
   "main": "src/server.ts",
   "scripts": {

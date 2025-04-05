@@ -1,54 +1,66 @@
-import js from "@eslint/js";
-import * as tseslint from "typescript-eslint";
-import prettier from "eslint-config-prettier";
-import pluginPrettier from "eslint-plugin-prettier";
-import eslintComments from "eslint-plugin-eslint-comments"; // Import the plugin
-import globals from "globals";
+// eslint.config.js
+const js = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const prettier = require('eslint-config-prettier');
+const pluginPrettier = require('eslint-plugin-prettier');
+const eslintComments = require('eslint-plugin-eslint-comments');
+const globals = require('globals');
 
-export default [
+module.exports = [
+  // Ignore patterns for all files
+  {
+    ignores: ['dist', 'node_modules'],
+  },
+  // Recommended JavaScript rules
   js.configs.recommended,
-  {
-    ignores: ["dist", "node_modules"],
-  },
-  // Configuration for eslint.config.js itself
-  {
-    files: ["eslint.config.js"],
-    languageOptions: {
-      globals: {
-        ...globals.node, // Include Node.js globals like 'process'
-      },
-    },
-  },
-  // JavaScript/Node rules go here
+  // TypeScript-specific configuration
   ...tseslint.configs.recommended,
   {
-    files: ["**/*.ts"],
+    files: ['**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: ["./tsconfig.json"],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: process.cwd(),
-        sourceType: "module",
+        sourceType: 'module',
       },
       globals: {
         ...globals.node,
-        process: "readonly",
       },
     },
     plugins: {
-      prettier: pluginPrettier, // Specify the plugin object here
-      "eslint-comments": eslintComments, // Specify the plugin object here
+      prettier: pluginPrettier,
+      'eslint-comments': eslintComments,
     },
     rules: {
-      "prettier/prettier": "off",
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["warn"],
-      "@typescript-eslint/no-explicit-any": "warn",
-      "no-unused-expressions": "off",
-      "no-warning-comments": "off",
-      "eslint-comments/no-unused-disable": "off", // Disable rule to keep comments
-      semi: "off",
-      "@typescript-eslint/semi": ["error", "always"],
+      'no-undef': 'off',
+      'prettier/prettier': 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn'],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-unused-expressions': 'off',
+      'no-warning-comments': 'off',
+      'eslint-comments/no-unused-disable': 'off',
+      semi: 'off',
+      '@typescript-eslint/semi': ['error', 'always'],
+    },
+  },
+  // JavaScript-specific configuration (for eslint.config.js and other .js files)
+  {
+    files: ['eslint.config.js', '**/*.js'],
+    languageOptions: {
+      parserOptions: {
+        sourceType: 'commonjs', // Treat .js files as CommonJS
+      },
+      globals: {
+        ...globals.node, // Define Node.js globals (process, module, etc.)
+      },
+    },
+    rules: {
+      'no-undef': 'off', // Disable no-undef to avoid 'process' errors
+      '@typescript-eslint/no-require-imports': 'off', // Allow require() in .js files
+      '@typescript-eslint/no-explicit-any': 'off', // Disable TypeScript-specific rules
+      '@typescript-eslint/no-unused-vars': 'off', // Disable TypeScript-specific rules
     },
   },
   prettier,

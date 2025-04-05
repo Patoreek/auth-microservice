@@ -1,19 +1,19 @@
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { PassportStatic } from "passport";
-import pool from "../config/db";
-import passport from "passport"; // Add this import
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { PassportStatic } from 'passport';
+import pool from '../config/db';
+import passport from 'passport'; // Already included
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 passport.serializeUser((user: any, done) => {
-  // Here, we're serializing the user by saving their id or any identifier you want
   done(null, user.id);
 });
 
+// Deserialize user by ID, fetching all fields
 passport.deserializeUser(async (id: number, done) => {
   try {
-    const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
     const user = res.rows[0];
-    done(null, user); // Pass the user object into the session
+    done(null, user);
   } catch (err) {
     done(err);
   }
@@ -25,30 +25,36 @@ const configureGoogleStrategy = (passport: PassportStatic) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID!,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        callbackURL: "/api/auth/google/callback",
+        callbackURL: '/api/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails?.[0]?.value;
+          if (!email) {
+            return done(null, false, { message: 'No email found from Google' });
+          }
 
-          if (!email)
-            return done(null, false, { message: "No email found from Google" });
-
-          const res = await pool.query("SELECT * FROM users WHERE email = $1", [
-            email,
-          ]);
+          const res = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
           let user = res.rows[0];
 
           if (!user) {
+            // Extract firstName, lastName, and displayName from profile
+            const firstName = profile.name?.givenName || profile.displayName?.split(' ')[0];
+            const lastName =
+              profile.name?.familyName ||
+              (profile.displayName?.split(' ').length > 1
+                ? profile.displayName.split(' ').slice(1).join(' ')
+                : '');
+            const displayName = profile.displayName || `${firstName} ${lastName}`.trim();
+
             const newUser = await pool.query(
-              "INSERT INTO users (email, name, provider) VALUES ($1, $2, $3) RETURNING *",
-              [email, profile.displayName, "google"],
+              'INSERT INTO users (email, first_name, last_name, display_name, provider) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+              [email, firstName, lastName, displayName, 'google'],
             );
             user = newUser.rows[0];
           }
 
           if (user.is_twofa_enabled) {
-            // Custom object to indicate 2FA is required before completing login
             return done(null, { requires2FA: true, userId: user.id });
           }
 
