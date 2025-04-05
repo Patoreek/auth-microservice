@@ -113,7 +113,6 @@ Your auth microservice uses a PostgreSQL users table structured as follows:
 
 ```
 ts
-ts
 fetch(“http://localhost:4000/api/auth/signup”, {
     method: “POST”,
     credentials: “include”,
