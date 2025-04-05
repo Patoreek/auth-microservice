@@ -11,6 +11,7 @@
 - TODO: Create functions for different DB connections + querying
 - TODO: Create Guide for the main aspects to configure
 - TODO: ENV variables to set and instrcutions on how to create random strings
+- TODO: ESLint & Prettier
 
 
 Create Random String: `openssl rand -hex 16`
