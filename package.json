@@ -1,6 +1,7 @@
 {
   "name": "auth-microservice",
   "version": "1.0.0",
+  "type": "module",
   "description": "Authentication microservice using Passport.js, JWT, and PostgreSQL",
   "main": "src/server.ts",
   "scripts": {
@@ -24,7 +25,9 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
-    "pg": "^8.14.1"
+    "pg": "^8.14.1",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
@@ -39,6 +42,8 @@
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-local": "^1.0.38",
     "@types/pg": "^8.11.11",
+    "@types/qrcode": "^1.5.5",
+    "@types/speakeasy": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
     "eslint": "^9.24.0",

@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth";
 import initializePassport from "./passport/localStrategy";
 import configureGoogleStrategy from "./passport/googleStrategy";
+import verify2FA from "./passport/verify2FA"; // Import verify2FA route
 import authenticate, { AuthenticatedRequest } from "./middlewares/authenticate";
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", verify2FA);
 // Example protected route
 app.get(
   "/api/protected",

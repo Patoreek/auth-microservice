@@ -40,12 +40,16 @@ const configureGoogleStrategy = (passport: PassportStatic) => {
           let user = res.rows[0];
 
           if (!user) {
-            // Optional: Create user if not exists
             const newUser = await pool.query(
               "INSERT INTO users (email, name, provider) VALUES ($1, $2, $3) RETURNING *",
               [email, profile.displayName, "google"],
             );
             user = newUser.rows[0];
+          }
+
+          if (user.is_twofa_enabled) {
+            // Custom object to indicate 2FA is required before completing login
+            return done(null, { requires2FA: true, userId: user.id });
           }
 
           return done(null, user);
