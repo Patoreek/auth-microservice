@@ -7,7 +7,7 @@ import { User } from "../models/userModel";
 
 const router = express.Router();
 
-const createJwtToken = (user: User): string => {
+const createJwtToken = (user: User, res: Response): string => {
   const token = jwt.sign(
     { id: user.id, email: user.email },
     process.env.JWT_SECRET as string,
@@ -15,6 +15,15 @@ const createJwtToken = (user: User): string => {
       expiresIn: "1h",
     },
   );
+
+  // Set token in a cookie
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 3600000, // 1 hour
+  });
+  
   return token;
 };
 
@@ -35,7 +44,7 @@ router.post("/signup", async (req: Request, res: Response): Promise<void> => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await createUser(email, firstName, lastName, hashedPassword);
     if (!user) return;
-    await createJwtToken(user);
+    await createJwtToken(user, res);
     res.status(200).json({ message: "User Signed up!", user: user });
     return;
   } catch (err) {
@@ -57,7 +66,7 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
           .json({ message: err?.message || "Authentication failed" });
       }
 
-      createJwtToken(user);
+      createJwtToken(user, res);
       res.status(200).json({ message: "User Logged In!", user: user });
     },
   )(req, res, next);
@@ -79,15 +88,7 @@ router.get(
     }
 
     const user = req.user as User;
-    const token = createJwtToken(user);
-
-    // Set token in a cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600000, // 1 hour
-    });
+    const token = createJwtToken(user, res);
 
     // Redirect to success with token (optional, if you prefer query param)
     res.redirect(`/api/auth/success?token=${token}`);
