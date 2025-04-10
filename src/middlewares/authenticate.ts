@@ -4,6 +4,8 @@ import jwt, { JwtPayload as DefaultJwtPayload } from 'jsonwebtoken';
 interface CustomJwtPayload extends DefaultJwtPayload {
   id: string;
   email?: string;
+  firstName: string;
+  lastName: string;
 }
 
 // Optional: Keep AuthenticatedRequest for type safety in route handlers
@@ -26,7 +28,8 @@ export default function authenticate(
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as CustomJwtPayload;
-
+    console.log("token:", token);
+    console.log("Decoded token:", jwt.decode(token));
     // Optional: check if decoded has `id` just to be safe
     if (!decoded.id) {
       res.status(403).json({ message: 'Invalid token payload' });
@@ -34,6 +37,7 @@ export default function authenticate(
     }
 
     req.user = decoded;
+    console.log("ASDASD", req.user);
     next();
   } catch (err) {
     res.status(403).json({ message: 'Invalid token', error: err });

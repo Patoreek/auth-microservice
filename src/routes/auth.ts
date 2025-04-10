@@ -8,12 +8,19 @@ import { User } from "../models/userModel";
 const router = express.Router();
 
 const createJwtToken = (user: User, res: Response): string => {
+  console.log('id:', user.id);
+  console.log('email:', user.email);
+  console.log('firstName:', user.firstName);
+  console.log('lastName:', user.lastName);
   const token = jwt.sign(
-    { id: user.id, email: user.email },
-    process.env.JWT_SECRET as string,
     {
-      expiresIn: "1h",
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
     },
+    process.env.JWT_SECRET as string,
+    { expiresIn: '1h' }
   );
 
   // Set token in a cookie
@@ -28,7 +35,7 @@ const createJwtToken = (user: User, res: Response): string => {
 };
 
 router.post("/signup", async (req: Request, res: Response): Promise<void> => {
-  const { email, password, firstName, lastName} = req.body;
+  const { email, password, firstName, lastName } = req.body;
 
   if (!email || !password) {
     res.status(400).json({ message: "Email and password are required" });
@@ -65,7 +72,7 @@ router.post("/login", (req: Request, res: Response, next: NextFunction) => {
           .status(400)
           .json({ message: err?.message || "Authentication failed" });
       }
-
+      console.log('/login: ', user);
       createJwtToken(user, res);
       res.status(200).json({ message: "User Logged In!", user: user });
     },
